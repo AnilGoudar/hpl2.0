@@ -1,14 +1,13 @@
 <script>
 	import Intro from "$lib/components/Intro.svelte";
+	import LatestNews from "$lib/components/LatestNews.svelte";
+	import QuickAccess from "$lib/components/QuickAccess.svelte";
+    
 
-    const liks = [
-        {title: "Players", href: '/players'},
-        {title: "Teams", href: '/teams'},
-        {title: "Fixtures", href: "/fixtures"},
-        {title: "Points Table", href: "/points"}
-    ]
+    
 </script>
 <Intro />
-<div class="px-3">
-    <h2 class="text-sm uppercase">QUICK ACCESS</h2>
+<div class="w-full px-3">
+    <QuickAccess />
+	<LatestNews />
 </div>
