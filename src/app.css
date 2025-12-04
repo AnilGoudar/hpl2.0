@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+body {
+    @apply text-gray-900 w-full h-full overflow-x-hidden;
+}
+
+.card {
+    border-radius: 8px;
+    @apply bg-white shadow-md p-4;
+}
