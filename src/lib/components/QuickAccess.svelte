@@ -21,7 +21,7 @@
             <a href={link.href} class="flex justify-between items-start">
                 <div class="flex flex-col gap-2">
                     <img src={link.iconId} alt="link" class="w-[20px] h-[20px]"/>
-                    <span class="text-md text-blue-800">{link.title}</span>
+                    <span class="text-md text-gray-800">{link.title}</span>
                 </div>
                 <img src={ChevronRight} alt="go to" class="w-[20px] h-[20px]"/>
             </a>
