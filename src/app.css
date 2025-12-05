@@ -1,22 +1,22 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 body {
-    @apply text-gray-900 w-full h-full overflow-x-hidden;
+	@apply text-gray-900 w-full h-full overflow-x-hidden;
 }
 
 .card {
-    border-radius: 8px;
-    @apply bg-white shadow-md p-4;
+	border-radius: 8px;
+	@apply bg-white shadow-md p-4;
 }
 
 .form-input {
-    @apply space-y-1;
+	@apply space-y-1;
 }
 
 .form-input label {
-    @apply block text-sm font-medium text-gray-700;
+	@apply block text-sm font-medium text-gray-700;
 }
 
 .form-input input {
-    @apply appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-lg;
+	@apply appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-lg;
 }
