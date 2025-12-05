@@ -4,7 +4,7 @@
 
 <footer class="w-full text-center space-y-4 py-6 mt-5 
     bg-gradient-to-r from-[#1877F2] via-[#0E63D8] to-[#1877F2]
-    border-t-1 border-[#4895FF] shadow-inner">
+    border-t-1 border-[#4895FF] shadow-inner pb-[80px]">
 
     <div class="flex justify-center items-center gap-4">
 
