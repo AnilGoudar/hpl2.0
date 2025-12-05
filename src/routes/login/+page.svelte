@@ -26,8 +26,7 @@
             const payload = {email, password}
             const loginResponse = await hplFetch('/login', 'POST', payload);
             const { data } = await loginResponse.json();
-            localStorage.setItem('user', data.user);
-            
+            localStorage.setItem('hpl-user', JSON.stringify(data));
         } catch (error) {
             alert(error);
         } finally {

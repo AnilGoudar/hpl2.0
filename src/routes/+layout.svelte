@@ -4,10 +4,23 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import BottomNavbar from '$lib/components/BottomNavbar.svelte';
-	import { loadingState } from '$lib/state/+state.svelte';
-
+	import { bottomNavLinks, loadingState, setUser } from '$lib/state/+state.svelte';
+	import { onMount } from 'svelte';
 
 	let { children } = $props();
+
+	onMount(() => {
+		const storedUser = localStorage.getItem('hpl-user');
+		if (storedUser) {
+			const userData = JSON.parse(storedUser);
+			const user = {
+				id: userData.user_id,
+				role: userData.role,
+				email: userData.email
+			}
+			setUser(user)
+		}
+	})
 </script>
 
 <svelte:head>
