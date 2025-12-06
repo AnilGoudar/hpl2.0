@@ -1,16 +1,8 @@
 <script>
-	import Players from '$lib/assets/Icons/players.svg';
-	import Teams from '$lib/assets/Icons/teams.svg';
-	import Fixtures from '$lib/assets/Icons/fixtures.svg';
-	import Table from '$lib/assets/Icons/table.svg';
 	import ChevronRight from '$lib/assets/Icons/chevronRight.svg';
+	import { bottomNavLinks } from '$lib/state/+state.svelte';
 
-	const links = [
-		{ title: 'Players', href: '/players', iconId: Players },
-		{ title: 'Teams', href: '/teams', iconId: Teams },
-		{ title: 'Fixtures', href: '/fixtures', iconId: Fixtures },
-		{ title: 'Points Table', href: '/points', iconId: Table }
-	];
+	const links = bottomNavLinks.filter((link) => link.title !== 'Login' && link.title !== 'Profile' && link.title !== 'Home');
 </script>
 
 <section class="">

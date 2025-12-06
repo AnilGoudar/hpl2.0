@@ -4,6 +4,8 @@ import Fixtures from '$lib/assets/Icons/fixtures.svg';
 import Home from '$lib/assets/Icons/home.svg';
 import Login from '$lib/assets/Icons/login.svg';
 import Profile from '$lib/assets/Icons/profile.svg';
+import Table from '$lib/assets/Icons/table.svg';
+
 
 export const loadingState = $state({
 	message: '',
@@ -40,5 +42,6 @@ export const bottomNavLinks = $state([
 	{ title: 'Teams', href: '/teams', iconId: Teams, path: 'teams' },
 	{ title: 'Fixtures', href: '/fixtures', iconId: Fixtures, path: 'fixtures' },
 	{ title: 'Login', href: '/login', iconId: Login, path: 'login' },
-	{ title: 'Profile', href: '/profile', iconId: Profile, path: 'profile' }
+	{ title: 'Profile', href: '/profile', iconId: Profile, path: 'profile' },
+	{ title: 'Points Table', href: '/points', iconId: Table }
 ]);
