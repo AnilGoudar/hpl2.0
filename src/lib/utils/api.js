@@ -1,7 +1,7 @@
-export async function hplFetch(path, method = 'GET', body = null, headers = {}) {
+export async function hplFetch(fetchFn = fetch, path, method = 'GET', body = null, headers = {}) {
 	const defaultHeaders = {
 		'Content-Type': 'application/json',
-		'credentials': 'include',
+		credentials: 'include',
 		...headers
 	};
 
@@ -18,10 +18,10 @@ export async function hplFetch(path, method = 'GET', body = null, headers = {}) 
 
 	// eslint-disable-next-line no-useless-catch
 	try {
-		const run = () => fetch(`/api${path}`, config);
+		const run = () => fetchFn(`/api${path}`, config);
 		let response = await run();
 		if (response.status === 401) {
-			const refresh = await fetch('/api/session', { method: 'GET' });
+			const refresh = await fetchFn('/api/session', { method: 'GET' });
 			if (refresh.ok) {
 				response = await run();
 			} else {

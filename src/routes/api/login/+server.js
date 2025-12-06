@@ -40,7 +40,7 @@ export async function POST({ request, cookies }) {
 	return json(
 		{
 			data: {
-				...admin,
+				...admin
 			}
 		},
 		{ status: 200 }

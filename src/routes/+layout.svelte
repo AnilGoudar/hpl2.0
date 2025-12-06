@@ -26,7 +26,7 @@
 				goto('/');
 			}
 		} else {
-			setUser({id: '', role: '', email: ''})
+			setUser({ id: '', role: '', email: '' });
 		}
 	});
 </script>

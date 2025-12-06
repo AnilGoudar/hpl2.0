@@ -26,7 +26,7 @@
 			}
 			startLoading('Logging In...');
 			const payload = { email, password };
-			const loginResponse = await hplFetch('/login', 'POST', payload);
+			const loginResponse = await hplFetch(fetch, '/login', 'POST', payload);
 			const { data } = await loginResponse.json();
 			localStorage.setItem('hpl-user', JSON.stringify(data));
 			const currentPath = page.url.pathname;
