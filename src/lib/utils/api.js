@@ -1,6 +1,7 @@
 export async function hplFetch(path, method = 'GET', body = null, headers = {}) {
 	const defaultHeaders = {
 		'Content-Type': 'application/json',
+		'credentials': 'include',
 		...headers
 	};
 
@@ -17,7 +18,16 @@ export async function hplFetch(path, method = 'GET', body = null, headers = {}) 
 
 	// eslint-disable-next-line no-useless-catch
 	try {
-		const response = await fetch(`/api${path}`, config);
+		const run = () => fetch(`/api${path}`, config);
+		let response = await run();
+		if (response.status === 401) {
+			const refresh = await fetch('/api/session', { method: 'GET' });
+			if (refresh.ok) {
+				response = await run();
+			} else {
+				throw new Error('Session Expired. Login again');
+			}
+		}
 		if (!response.ok) {
 			let errorData;
 			try {

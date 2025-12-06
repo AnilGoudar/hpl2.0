@@ -25,6 +25,8 @@
 			if (currentPath === '/login') {
 				goto('/');
 			}
+		} else {
+			setUser({id: '', role: '', email: ''})
 		}
 	});
 </script>

@@ -2,8 +2,8 @@
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { bottomNavLinks, userState } from '$lib/state/+state.svelte';
-	let isLoggedIn = $derived(() => Boolean(userState.id));
-	let activeNav = $derived(page.url.pathname.split('/')[1] || '');
+	let isLoggedIn = $derived.by(() => Boolean(userState.id));
+	let activeNav = $derived.by(() => page.url.pathname.split('/')[1] || '');
 </script>
 
 <div

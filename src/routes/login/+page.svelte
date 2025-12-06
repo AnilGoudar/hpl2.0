@@ -1,4 +1,6 @@
 <script>
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { startLoading, stopLoading } from '$lib/state/+state.svelte';
 	import { emailRegex } from '$lib/utils';
 	import { hplFetch } from '$lib/utils/api';
@@ -27,6 +29,10 @@
 			const loginResponse = await hplFetch('/login', 'POST', payload);
 			const { data } = await loginResponse.json();
 			localStorage.setItem('hpl-user', JSON.stringify(data));
+			const currentPath = page.url.pathname;
+			if (currentPath === '/login') {
+				window.location.href = '/';
+			}
 		} catch (error) {
 			alert(error);
 		} finally {

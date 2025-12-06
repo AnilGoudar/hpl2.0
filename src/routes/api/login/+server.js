@@ -41,7 +41,6 @@ export async function POST({ request, cookies }) {
 		{
 			data: {
 				...admin,
-				access_token: session.access_token
 			}
 		},
 		{ status: 200 }
