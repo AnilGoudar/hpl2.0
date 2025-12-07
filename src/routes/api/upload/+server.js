@@ -5,7 +5,6 @@ export async function POST({ request }) {
 	const form = await request.formData();
 	const file = form.get('file');
 	const storageBucket = form.get('storage');
-	console.log(form, request, 'request');
 	if (!file || !storageBucket) {
 		return json({ error: 'invalid form data' }, { status: 400 });
 	}

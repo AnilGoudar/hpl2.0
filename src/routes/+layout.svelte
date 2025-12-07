@@ -34,8 +34,12 @@
 			setUser({ id: '', role: '', email: '' });
 		}
 
-		// set teams and player categories from load
-		setStaticApiData({ teams: page.data.teams, playerCategories: page.data.playerCategories });
+		// set static data fetched from api
+		setStaticApiData({
+			teams: page.data.teams,
+			playerCategories: page.data.playerCategories,
+			seasons: page.data.seasons
+		});
 	});
 </script>
 

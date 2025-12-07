@@ -47,7 +47,8 @@ export const bottomNavLinks = $state([
 
 export const staticApiData = $state({
 	teams: null,
-	playerCategories: null
+	playerCategories: null,
+	seasons: null
 });
 
 export function setStaticApiData(data) {
@@ -56,5 +57,8 @@ export function setStaticApiData(data) {
 	}
 	if (!staticApiData.playerCategories && data.playerCategories) {
 		staticApiData.playerCategories = data.playerCategories;
+	}
+	if (!staticApiData.seasons && data.seasons) {
+		staticApiData.seasons = data.seasons;
 	}
 }
