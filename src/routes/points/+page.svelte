@@ -1,5 +1,6 @@
 <script>
 	import { staticApiData } from '$lib/state/+state.svelte.js';
+	import { displayTeamName } from '$lib/utils/index.js';
 	import { onMount } from 'svelte';
 
 	export let data;
@@ -8,26 +9,6 @@
 	const currentSeason = staticApiData?.seasons?.find((season) =>
 		['Scheduled', 'Active'].includes(season.status)
 	);
-
-	function displayTeamName(name) {
-		switch (name) {
-			case 'BSS Hunters':
-				return 'BSS';
-				break;
-			case 'Rani Chennamma Warriors':
-				return 'RCW';
-				break;
-			case 'SRC':
-				return 'SRC';
-				break;
-			case 'Angadi Kings':
-				return 'AK';
-				break;
-			case 'GSN Yuva Gharjane':
-				return 'GSN';
-				break;
-		}
-	}
 </script>
 
 <div class="w-full bg-white">

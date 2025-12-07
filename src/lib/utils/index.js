@@ -61,3 +61,34 @@ export async function fakePayementScreenshots(file) {
 		warnings
 	};
 }
+
+export function displayTeamName(name) {
+	let displayName = '';
+	switch (name) {
+		case 'BSS Hunters':
+			displayName = 'BSS';
+			break;
+		case 'Rani Chennamma Warriors':
+			displayName = 'RCW';
+			break;
+		case 'SRC':
+			displayName = 'SRC';
+			break;
+		case 'Angadi Kings':
+			displayName = 'AK';
+			break;
+		case 'GSN Yuva Gharjane':
+			displayName = 'GSN';
+			break;
+	}
+	return displayName;
+}
+
+export function shuffleList(list) {
+	let arr = [...list];
+	for (let i = arr.length - 1; i > 0; i--) {
+		let j = Math.floor(Math.random() * (i + 1));
+		[arr[i], arr[j]] = [arr[j], arr[i]];
+	}
+	return arr;
+}
