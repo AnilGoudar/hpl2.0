@@ -2,16 +2,83 @@
 	import { goto } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
 	import UpiNote from '$lib/components/UpiNote.svelte';
+	import { startLoading, stopLoading } from '$lib/state/+state.svelte';
 	import { compressImage, fakePayementScreenshots } from '$lib/utils';
+	import { hplFetch } from '$lib/utils/api';
 	let fullName = '';
 	let phone = '';
 	let role = 'Batsman';
 	let photoFile = null;
-	let preview = null;
+	let previewPlayer = null;
 	let paymentFile = null;
 	let paymentPreview = null;
 
-	async function registerPlayer() {}
+	async function handlePhotoFileChange(event, type) {
+		const file = event.target.files[0];
+		if (!file) return;
+		if (type === 'payment') {
+			const { warnings, isSuspicious } = await fakePayementScreenshots(file);
+			if (isSuspicious) {
+				alert(warnings[0]);
+				return;
+			}
+		}
+		const compressedFile = await compressImage(file, 900, 0.6);
+		let newFile = new File([compressedFile], file.name.replace(/\.[^/.]+$/, '.jpg'), {
+			type: 'image/jpeg'
+		});
+		if (type === 'payment') {
+			paymentFile = newFile;
+			paymentPreview = URL.createObjectURL(newFile);
+		} else {
+			photoFile = newFile;
+			previewPlayer = URL.createObjectURL(newFile);
+		}
+	}
+
+	async function uploadFile(file, storage) {
+		const form = new FormData();
+		form.append('file', file);
+		form.append('storage', storage);
+		const resp = await hplFetch(fetch, '/upload', 'POST', form);
+		const { url } = await resp.json();
+		return url;
+	}
+
+	async function registerPlayer() {
+		if (!fullName || !phone || !photoFile || !paymentFile) {
+			alert('All fields are required for registration.');
+			return;
+		}
+		try {
+			startLoading('Registering player...');
+			const player_photo_url = await uploadFile(photoFile, 'players');
+			const payment_proof_url = await uploadFile(paymentFile, 'payments');
+
+			const registerResp = await hplFetch(fetch, '/players/register', 'POST', {
+				name: fullName,
+				phone,
+				role,
+				player_photo_url,
+				payment_proof_url
+			});
+			if (!registerResp.ok) {
+				alert('Player registration failed');
+				return;
+			}
+			alert('Player registered successfully');
+			fullName = '';
+			phone = '';
+			role = 'Batsman';
+			photoFile = '';
+			paymentFile = '';
+			goto('/players');
+		} catch (e) {
+			alert(e.message);
+		} finally {
+			stopLoading();
+		}
+	}
 </script>
 
 <div class="mx-auto max-w-2xl p-2">
@@ -22,11 +89,11 @@
 	<div class="mt-5 flex flex-col items-center gap-4">
 		<div
 			class="bg-content-light flex h-28 w-28 items-center justify-center rounded-full border-2 border-gray-400"
-			class:border-solid={preview}
-			class:border-dashed={!preview}
+			class:border-solid={previewPlayer}
+			class:border-dashed={!previewPlayer}
 		>
-			{#if preview}
-				<img src={preview} class="h-full w-full rounded-full object-cover" alt="player" />
+			{#if previewPlayer}
+				<img src={previewPlayer} class="h-full w-full rounded-full object-cover" alt="player" />
 			{:else}
 				<label class="flex cursor-pointer flex-col items-center">
 					<span style="font-size: 20px">
@@ -42,7 +109,7 @@
 						name="player-photo"
 						type="file"
 						accept="image/*"
-						on:change={handlePhotoUpload}
+						onchange={(event) => handlePhotoFileChange(event)}
 					/>
 					<p class="text-grey-700 text-sm font-medium">Add Photo</p>
 				</label>
@@ -93,7 +160,7 @@
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div
 				class="mt-2 flex h-40 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed border-gray-400 bg-gray-50"
-				on:click={() => document.getElementById('payment-proof').click()}
+				onclick={() => document.getElementById('payment-proof').click()}
 			>
 				{#if paymentPreview}
 					<img src={paymentPreview} alt="payment proof" class="h-full w-full object-contain p-2" />
@@ -107,7 +174,7 @@
 				class="hidden"
 				type="file"
 				accept="image/*"
-				on:change={handlePaymentUpload}
+				onchange={(event) => handlePhotoFileChange(event, 'payment')}
 			/>
 		</div>
 

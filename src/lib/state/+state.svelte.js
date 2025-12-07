@@ -6,7 +6,6 @@ import Login from '$lib/assets/Icons/login.svg';
 import Profile from '$lib/assets/Icons/profile.svg';
 import Table from '$lib/assets/Icons/table.svg';
 
-
 export const loadingState = $state({
 	message: '',
 	isLoading: false
@@ -43,5 +42,19 @@ export const bottomNavLinks = $state([
 	{ title: 'Fixtures', href: '/fixtures', iconId: Fixtures, path: 'fixtures' },
 	{ title: 'Login', href: '/login', iconId: Login, path: 'login' },
 	{ title: 'Profile', href: '/profile', iconId: Profile, path: 'profile' },
-	{ title: 'Points Table', href: '/points', iconId: Table }
+	{ title: 'Points Table', href: '/points', iconId: Table, path: 'points' }
 ]);
+
+export const staticApiData = $state({
+	teams: null,
+	playerCategories: null
+});
+
+export function setStaticApiData(data) {
+	if (!staticApiData.teams && data.teams) {
+		staticApiData.teams = data.teams;
+	}
+	if (!staticApiData.playerCategories && data.playerCategories) {
+		staticApiData.playerCategories = data.playerCategories;
+	}
+}

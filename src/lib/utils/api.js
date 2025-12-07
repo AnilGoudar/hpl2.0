@@ -12,7 +12,10 @@ export async function hplFetch(fetchFn = fetch, path, method = 'GET', body = nul
 		}
 	};
 
-	if (body !== null && ['POST', 'PUT'].includes(method)) {
+	if (body instanceof FormData) {
+		config.body = body;
+		delete config.headers['Content-Type'];
+	} else if (body !== null && ['POST', 'PUT'].includes(method)) {
 		config.body = JSON.stringify(body);
 	}
 

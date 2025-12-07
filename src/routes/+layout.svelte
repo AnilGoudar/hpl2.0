@@ -4,7 +4,12 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import BottomNavbar from '$lib/components/BottomNavbar.svelte';
-	import { bottomNavLinks, loadingState, setUser } from '$lib/state/+state.svelte';
+	import {
+		bottomNavLinks,
+		loadingState,
+		setStaticApiData,
+		setUser
+	} from '$lib/state/+state.svelte';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -28,6 +33,9 @@
 		} else {
 			setUser({ id: '', role: '', email: '' });
 		}
+
+		// set teams and player categories from load
+		setStaticApiData({ teams: page.data.teams, playerCategories: page.data.playerCategories });
 	});
 </script>
 

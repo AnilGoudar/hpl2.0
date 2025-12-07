@@ -2,7 +2,9 @@
 	import ChevronRight from '$lib/assets/Icons/chevronRight.svg';
 	import { bottomNavLinks } from '$lib/state/+state.svelte';
 
-	const links = bottomNavLinks.filter((link) => link.title !== 'Login' && link.title !== 'Profile' && link.title !== 'Home');
+	const links = bottomNavLinks.filter(
+		(link) => link.title !== 'Login' && link.title !== 'Profile' && link.title !== 'Home'
+	);
 </script>
 
 <section class="">

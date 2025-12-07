@@ -1,5 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
+	import PlayerCard from '$lib/components/PlayerCard.svelte';
 
 	export let data;
 	const { players, error } = data;
@@ -17,4 +18,13 @@
 			>
 		</div>
 	</div>
+	{#if players.length === 0}
+		<p class="text-center text-gray-500">No players registered yet.</p>
+	{:else}
+		<div class="w-full grid grid-cols-1 gap-4 sm:grid-cols-3">
+			{#each players as player}
+				<PlayerCard {player} />
+			{/each}
+		</div>
+	{/if}
 {/if}
