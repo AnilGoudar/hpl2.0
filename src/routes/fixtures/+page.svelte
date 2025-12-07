@@ -35,6 +35,7 @@
 
 	async function generateFixtures(reShuffle = false) {
 		if (!teams || teams.length < 2) return;
+		startLoading('Generating fixtures...');
 		// rank based on seed
 		let teamList = [...teams].sort((t1, t2) => Number(t1.seed_rank) - Number(t2.seed_rank));
 		if (reShuffle) {
@@ -46,7 +47,6 @@
 		if (hasBye) {
 			teamList.push({ id: 'bye', name: 'bye' });
 		}
-
 		const totalTeams = teamList.length;
 		const rounds = totalTeams - 1;
 		const half = totalTeams / 2;
@@ -79,26 +79,29 @@
 		let date = new Date(defaultStartDate);
 		let counter = 0;
 
-		fixtures = all.map((f, idx) => {
-			const isMorning = counter % 2 === 0;
-			const match_date = date.toISOString().substring(0, 10);
-			counter++;
-			if (counter % 2 === 0) {
-				date.setDate(date.getDate() + 1);
-			}
-			return {
-				match_number: idx + 1,
-				team_a: f.team_a.id,
-				team_b: f.team_b.id,
-				leg: f.leg,
-				match_date,
-				start_time: isMorning ? TIMES[0] : TIMES[1],
-				venue: 'HADAGALI',
-				season_id: currentSeason.id
-			};
-		});
+		setTimeout(() => {
+			fixtures = all.map((f, idx) => {
+				const isMorning = counter % 2 === 0;
+				const match_date = date.toISOString().substring(0, 10);
+				counter++;
+				if (counter % 2 === 0) {
+					date.setDate(date.getDate() + 1);
+				}
+				return {
+					match_number: idx + 1,
+					team_a: f.team_a.id,
+					team_b: f.team_b.id,
+					leg: f.leg,
+					match_date,
+					start_time: isMorning ? TIMES[0] : TIMES[1],
+					venue: 'HADAGALI',
+					season_id: currentSeason.id
+				};
+			});
 
-		setFixturesToLocalStorage(fixtures);
+			setFixturesToLocalStorage(fixtures);
+			stopLoading();
+		}, 1000);
 	}
 
 	function getTeamDisplayName(id) {
@@ -140,7 +143,7 @@
 			{#each storedFixtures as match}
 				<div class="bg-white p-4 rounded-xl shadow-sm border">
 					<div class="text-xs font-bold text-gray-500 mb-2">
-						Match #{match.match_number}
+						Match #{match.match_number} (Leg: {match.leg})
 					</div>
 					<div class="flex items-center mb-3">
 						<div class="flex-1 flex items-center">
