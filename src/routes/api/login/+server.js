@@ -25,7 +25,7 @@ export async function POST({ request, cookies }) {
 	// set the cookies
 	cookies.set('hpl_access_token', session.access_token, {
 		path: '/',
-		httpOnly: false,
+		httpOnly: true,
 		sameSite: 'lax',
 		secure: process.env.NODE_ENV === 'production',
 		maxAge: 60 * 60 * 24 * 10
