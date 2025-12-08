@@ -121,7 +121,7 @@
 
 {#if !userState.id && fixtures.length === 0}
 	<Note text="Please comeback  soon, fixtures will be announced soon" />
-{:else if (userState.id && storedFixtures?.length === 0) || storedFixtures?.length > 1}
+{:else if (userState.id && storedFixtures?.length === 0 || storedFixtures?.length > 1)}
 	<div class="w-full">
 		<h1 class="text-xl font-bold mb-4 text-gray-800 text-center">Admin Fixture Generator</h1>
 
