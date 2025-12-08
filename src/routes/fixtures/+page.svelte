@@ -35,73 +35,78 @@
 
 	async function generateFixtures(reShuffle = false) {
 		if (!teams || teams.length < 2) return;
-		startLoading('Generating fixtures...');
-		// rank based on seed
-		let teamList = [...teams].sort((t1, t2) => Number(t1.seed_rank) - Number(t2.seed_rank));
-		if (reShuffle) {
-			teamList = shuffleList(teamList);
-			fixtures = [];
-		}
-		const n = teamList.length;
-		const hasBye = n % 2 !== 0;
-		if (hasBye) {
-			teamList.push({ id: 'bye', name: 'bye' });
-		}
-		const totalTeams = teamList.length;
-		const rounds = totalTeams - 1;
-		const half = totalTeams / 2;
-
-		let leg1 = [];
-		// leg 1 round robin
-		for (let round = 0; round < rounds; round++) {
-			for (let i = 0; i < half; i++) {
-				const teamA = teamList[i];
-				const teamB = teamList[totalTeams - 1 - i];
-				if (teamA.id !== 'bye' && teamB.id !== 'bye') {
-					leg1.push({
-						team_a: teamA,
-						team_b: teamB,
-						leg: 1
-					});
-				}
+		try {
+			startLoading('Generating fixtures...');
+			// rank based on seed
+			let teamList = [...teams].sort((t1, t2) => Number(t1.seed_rank) - Number(t2.seed_rank));
+			if (reShuffle) {
+				teamList = shuffleList(teamList);
+				fixtures = [];
 			}
-			teamList.splice(1, 0, teamList.pop());
-		}
-		// leg 2
-		const leg2 = leg1.map((f) => ({
-			team_a: f.team_b,
-			team_b: f.team_a,
-			leg: 2
-		}));
+			const n = teamList.length;
+			const hasBye = n % 2 !== 0;
+			if (hasBye) {
+				teamList.push({ id: 'bye', name: 'bye' });
+			}
+			const totalTeams = teamList.length;
+			const rounds = totalTeams - 1;
+			const half = totalTeams / 2;
 
-		const all = [...leg1, ...leg2];
-
-		let date = new Date(defaultStartDate);
-		let counter = 0;
-
-		setTimeout(() => {
-			fixtures = all.map((f, idx) => {
-				const isMorning = counter % 2 === 0;
-				const match_date = date.toISOString().substring(0, 10);
-				counter++;
-				if (counter % 2 === 0) {
-					date.setDate(date.getDate() + 1);
+			let leg1 = [];
+			// leg 1 round robin
+			for (let round = 0; round < rounds; round++) {
+				for (let i = 0; i < half; i++) {
+					const teamA = teamList[i];
+					const teamB = teamList[totalTeams - 1 - i];
+					if (teamA.id !== 'bye' && teamB.id !== 'bye') {
+						leg1.push({
+							team_a: teamA,
+							team_b: teamB,
+							leg: 1
+						});
+					}
 				}
-				return {
-					match_number: idx + 1,
-					team_a: f.team_a.id,
-					team_b: f.team_b.id,
-					leg: f.leg,
-					match_date,
-					start_time: isMorning ? TIMES[0] : TIMES[1],
-					venue: 'HADAGALI',
-					season_id: currentSeason.id
-				};
-			});
+				teamList.splice(1, 0, teamList.pop());
+			}
+			// leg 2
+			const leg2 = leg1.map((f) => ({
+				team_a: f.team_b,
+				team_b: f.team_a,
+				leg: 2
+			}));
 
-			setFixturesToLocalStorage(fixtures);
-			stopLoading();
-		}, 1000);
+			const all = [...leg1, ...leg2];
+
+			let date = new Date(defaultStartDate);
+			let counter = 0;
+
+			setTimeout(() => {
+				fixtures = all.map((f, idx) => {
+					const isMorning = counter % 2 === 0;
+					const match_date = date.toISOString().substring(0, 10);
+					counter++;
+					if (counter % 2 === 0) {
+						date.setDate(date.getDate() + 1);
+					}
+					return {
+						match_number: idx + 1,
+						team_a: f.team_a.id,
+						team_b: f.team_b.id,
+						leg: f.leg,
+						match_date,
+						start_time: isMorning ? TIMES[0] : TIMES[1],
+						venue: 'HADAGALI',
+						season_id: currentSeason.id
+					};
+				});
+
+				setFixturesToLocalStorage(fixtures);
+				stopLoading();
+			}, 1000);
+		} catch (e) {
+			console.log(e.message);
+			window.location.href = '/';
+		}
 	}
 
 	function getTeamDisplayName(id) {
@@ -121,7 +126,7 @@
 
 {#if !userState.id && fixtures.length === 0}
 	<Note text="Please comeback  soon, fixtures will be announced soon" />
-{:else if (userState.id && storedFixtures?.length === 0 || storedFixtures?.length > 1)}
+{:else if (userState.id && storedFixtures?.length === 0) || storedFixtures?.length > 1}
 	<div class="w-full">
 		<h1 class="text-xl font-bold mb-4 text-gray-800 text-center">Admin Fixture Generator</h1>
 

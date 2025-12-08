@@ -77,7 +77,7 @@
 					<div
 						class="flex items-center justify-between rounded-lg px-3 py-2
                    {i % 2 === 0 ? 'bg-gray-100' : 'bg-gray-200'}"
-						onclick={() => goto(`/players/${player.id}`)}
+						onclick={() => (window.location.href = `/players/${player.id}`)}
 					>
 						<p class="font-medium text-gray-800">
 							{i + 1}. {player.name} <span class="text-red-900">{getPlayerCode(player)}</span>

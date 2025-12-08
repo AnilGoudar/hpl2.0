@@ -72,7 +72,7 @@
 			role = 'Batsman';
 			photoFile = '';
 			paymentFile = '';
-			goto('/players');
+			window.location.href = '/players';
 		} catch (e) {
 			alert(e.message);
 		} finally {

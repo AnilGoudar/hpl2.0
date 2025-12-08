@@ -1,5 +1,4 @@
 <script>
-	import { goto } from '$app/navigation';
 </script>
 
 <footer
@@ -19,7 +18,7 @@
 		</a>
 
 		<button
-			onclick={() => goto('/rules')}
+			onclick={() => (window.location.href = '/rules')}
 			class="h-[42px] px-6 py-2
                    bg-[#0053B3] text-white font-semibold
                    border-1 border-white rounded-full

@@ -11,7 +11,6 @@
 		setUser
 	} from '$lib/state/+state.svelte';
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 
 	let { children } = $props();
@@ -28,7 +27,7 @@
 			setUser(user);
 			const currentPath = page.url.pathname;
 			if (currentPath === '/login') {
-				goto('/');
+				window.location.href = '/';
 			}
 		} else {
 			setUser({ id: '', role: '', email: '' });

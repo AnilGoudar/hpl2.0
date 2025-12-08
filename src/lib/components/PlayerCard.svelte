@@ -1,6 +1,4 @@
 <script>
-	import { goto } from '$app/navigation';
-
 	const { player } = $props();
 
 	const name = player.name;
@@ -28,7 +26,7 @@
 <button
 	class="relative flex w-full items-center overflow-hidden rounded-lg border border-gray-100 bg-white p-3
            text-left shadow-md transition-shadow duration-200 hover:shadow-lg active:bg-gray-50"
-	onclick={() => goto(`/players/${player.id}`)}
+	onclick={() => (window.location.href = `/players/${player.id}`)}
 >
 	<div class="relative flex-shrink-0">
 		<img

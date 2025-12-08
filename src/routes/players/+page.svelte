@@ -13,7 +13,7 @@
 		<div class="flex justify-between items-center border-b-1 border-gray-900 pb-2">
 			<h2 class="text-2xl">All Players ({players.length})</h2>
 			<button
-				onclick={() => goto('/players/register')}
+				onclick={() => (window.location.href = '/players/register')}
 				class="border border-blue-500 rounded-full px-4 py-1 shadow">Register</button
 			>
 		</div>
