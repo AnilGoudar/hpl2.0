@@ -29,6 +29,8 @@
 			canUserUpdatePlayer = true;
 		}
 	});
+
+	function deletePlayer() {}
 </script>
 
 <div class="w-full mx-auto max-w-xl p-4 sm:p-6">

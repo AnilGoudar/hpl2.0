@@ -102,3 +102,14 @@ export function displayDate(date) {
 	if (mm < 10) mm = '0' + mm;
 	return dd + '/' + mm + '/' + yyyy;
 }
+
+export function getRole(role) {
+	switch (role) {
+		case 'AllRounder':
+			return 'All-Rounder';
+		case 'Wicketkeeper':
+			return 'Wicket-Keeper';
+		default:
+			return role;
+	}
+}
