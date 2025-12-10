@@ -2,7 +2,10 @@ import { supabase } from '$lib/supabaseClient';
 import { json } from '@sveltejs/kit';
 
 export async function GET() {
-	const { data, error } = await supabase.from('fixtures').select('*');
+	const { data, error } = await supabase
+		.from('fixtures')
+		.select('*')
+		.order('match_date', { ascending: true });
 	if (error) {
 		return json(500, error.message);
 	}

@@ -195,7 +195,7 @@
 		</div>
 	</div>
 {:else if fixtures.length > 0}
-	<div class="space-y-4">
+	<div class="w-full space-y-4">
 		<h1 class="text-xl font-bold mb-4 text-gray-800 text-center">HPL S2 Fixtures</h1>
 		{#if userState.id}
 			<button
