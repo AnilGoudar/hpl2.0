@@ -2,7 +2,7 @@
 	import { staticApiData } from '$lib/state/+state.svelte';
 	import { displayTeamName } from '$lib/utils';
 
-	const { teamId, showLogo = true } = $props();
+	const { teamId, showLogo = true, logoSize = 30 } = $props();
 	const allTeams = $derived.by(() => staticApiData?.teams);
 
 	const team = $derived.by(() => {
@@ -17,12 +17,13 @@
 	<div class="flex items-center gap-2">
 		{#if showLogo}
 			<img
-				class="h-6 w-6 rounded-full object-cover shadow-lg"
+				class="rounded-full object-cover shadow-lg"
 				src={team.logo_url}
 				alt="{team.name}team"
+				style="height: {logoSize}px; width: {logoSize}px;"
 			/>
 		{/if}
-		<div class="text-sm font-medium text-gray-900 truncate">
+		<div class="text-md font-medium text-gray-900 truncate">
 			{displayTeamName(team.name)}
 		</div>
 	</div>

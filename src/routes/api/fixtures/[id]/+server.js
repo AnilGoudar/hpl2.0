@@ -6,7 +6,7 @@ export async function GET({ params }) {
 
 	const { data: fixture, error: fixtureError } = await supabase
 		.from('fixtures')
-		.select('team_a, team_b')
+		.select('team_a, team_b, toss_winner, toss_decision')
 		.eq('id', id)
 		.single();
 
@@ -14,7 +14,7 @@ export async function GET({ params }) {
 		return ({ error: 'Unable to get fixture' }, { status: 500 });
 	}
 
-	const { team_a, team_b } = fixture;
+	const { team_a, team_b, toss_winner, toss_decision } = fixture;
 
 	// get players from team_a
 	const { data: playersA, error: playersAError } = await supabase
@@ -34,7 +34,9 @@ export async function GET({ params }) {
 	return json({
 		fixture: {
 			team_a,
-			team_b
+			team_b,
+			toss_winner,
+			toss_decision
 		},
 		teamAPlayers: playersA,
 		teamBPlayers: playersB

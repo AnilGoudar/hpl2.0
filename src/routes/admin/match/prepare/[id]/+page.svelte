@@ -19,6 +19,7 @@
 	let showTossModal = $state(false);
 	let tossWinnerId = $state(null);
 	let tossDecision = $state(null);
+	let fixtureStatus = $state(null);
 
 	onMount(async () => {
 		try {
@@ -28,6 +29,11 @@
 			currentFixture = fixture;
 			teamAPlayers = teamA;
 			teamBPlayers = teamB;
+			tossWinnerId = fixture?.toss_winner;
+			tossDecision = fixture?.toss_decision;
+			if (fixture?.toss_winner) {
+				currentStep = 3;
+			}
 		} catch (e) {
 			alert(e.message);
 		} finally {
@@ -75,7 +81,7 @@
 		<div class="text-center text-gray-500">Loading fixture details...</div>
 	{:else}
 		<h1 class="flex gap-2 items-center text-xl font-bold mb-6 text-gray-800 border-b pb-2">
-			Match Prep:
+			Match:
 			<DisplayTeamLogoName teamId={currentFixture.team_a} />
 			vs
 			<DisplayTeamLogoName teamId={currentFixture.team_b} />
@@ -115,13 +121,38 @@
 		{#if currentStep === 3}
 			<div class="p-6 bg-white shadow-lg rounded-xl">
 				{#if tossWinnerId}
-					<div class="mt-8 pt-4 border-t">
-						<p class="text-2xl font-bold mb-4 text-center">
-							Toss Recorded: <DisplayTeamLogoName teamId={tossWinnerId} /> chose to {tossDecision}
-						</p>
+					<div class="mt-8 pt-6 border-t border-gray-300">
+						<!-- Title -->
+						<div class="text-center mb-6">
+							<p class="text-sm font-semibold text-gray-600 tracking-wide">TOSS RECORDED</p>
+						</div>
+
+						<!-- Winner + Decision -->
+						<div class="flex flex-col items-center gap-4 mb-6 text-gray-900">
+							<!-- Winner -->
+							<div class="flex items-center gap-2 text-xl font-bold">
+								<DisplayTeamLogoName teamId={tossWinnerId} />
+							</div>
+
+							<!-- Decision -->
+							<div class="flex items-center gap-2 text-lg font-semibold">
+								<span>chose to</span>
+
+								<span
+									class="px-3 py-1 rounded-full text-white text-sm font-black uppercase tracking-wide
+					{tossDecision === 'bat' ? 'bg-orange-600 shadow-md' : 'bg-blue-600 shadow-md'}"
+								>
+									{tossDecision}
+								</span>
+							</div>
+						</div>
+
+						<!-- Action Button -->
 						<button
 							onclick={handleStartMatch}
-							class="w-full py-4 bg-green-600 text-white font-black text-xl rounded-lg hover:bg-green-700 transition shadow-xl shadow-green-900/30"
+							class="w-full py-4 rounded-xl text-lg font-black text-white
+			bg-green-600 hover:bg-green-700 active:bg-green-800
+			transition shadow-lg shadow-green-900/20"
 						>
 							GO LIVE 🔴
 						</button>
