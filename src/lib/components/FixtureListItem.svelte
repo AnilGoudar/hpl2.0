@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { userState } from '$lib/state/+state.svelte';
 	import { displayDate, displayTeamName } from '$lib/utils';
+	import Radio from '$lib/assets/Icons/liveRadio.svg';
 
 	let { match, teams } = $props();
 
@@ -17,7 +18,7 @@
 	function getStatusBadge(status) {
 		switch (status) {
 			case 'live':
-				return 'bg-red-100 text-red-700';
+				return 'bg-red-100 text-red-700 animate-pulse';
 			case 'completed':
 				return 'bg-green-100 text-green-700';
 			case 'upcoming':
@@ -52,8 +53,11 @@
 			Match #{match.match_number} (Leg: {match.leg})
 		</div>
 		<div
-			class={`text-[10px] px-2 py-1 rounded-full font-semibold ${getStatusBadge(match.status.toLowerCase())}`}
+			class={`flex gap-2 items-center text-[10px] px-2 py-1 rounded-full font-semibold ${getStatusBadge(match.status.toLowerCase())}`}
 		>
+			{#if match.status.toUpperCase() === 'LIVE'}
+				<img src={Radio} alt="live-badge" class="w-4 h-4 object-cover" />
+			{/if}
 			{match.status.toUpperCase()}
 		</div>
 	</div>

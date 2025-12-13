@@ -4,7 +4,6 @@ export async function hplFetch(fetchFn = fetch, path, method = 'GET', body = nul
 		credentials: 'include',
 		...headers
 	};
-
 	const config = {
 		method,
 		headers: {

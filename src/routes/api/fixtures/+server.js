@@ -5,7 +5,7 @@ export async function GET() {
 	const { data, error } = await supabase
 		.from('fixtures')
 		.select('*')
-		.order('match_date', { ascending: true });
+		.order('match_number', { ascending: true });
 	if (error) {
 		return json(500, error.message);
 	}

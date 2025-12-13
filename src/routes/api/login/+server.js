@@ -40,7 +40,8 @@ export async function POST({ request, cookies }) {
 	return json(
 		{
 			data: {
-				...admin
+				...admin,
+				access_token: session.access_token
 			}
 		},
 		{ status: 200 }

@@ -1,9 +1,11 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import DisplayTeamLogoName from '$lib/components/DisplayTeamLogoName.svelte';
 	import PlayingXISelection from '$lib/components/PlayingXISelection.svelte';
 	import TossModal from '$lib/components/TossModal.svelte';
 	import { startLoading, stopLoading } from '$lib/state/+state.svelte';
+	import { getHeaderAuthorisation } from '$lib/utils';
 	import { hplFetch } from '$lib/utils/api';
 	import { onMount } from 'svelte';
 
@@ -41,18 +43,53 @@
 		}
 	});
 
-	function handleTeamASubmitted(xi) {
+	async function handleTeamASubmitted(xi) {
 		if (xi.length !== 11) {
 			return alert('Please select exactly 11 players');
 		}
 		playingXITeamA = [...xi];
-		currentStep = 2;
+		//  save team to database
+		try {
+			startLoading('Saving fixture line for the team...');
+			const playerIds = xi.map((player) => player);
+			const body = playerIds.map((id, index) => ({
+				player_id: id,
+				team_id: currentFixture?.team_a,
+				fixture_id: fixtureId,
+				batting_order: index + 1
+			}));
+			const resp = await hplFetch(fetch, `/fixtures/lineups/${fixtureId}`, 'POST', body);
+			if (resp.ok) {
+				currentStep = 2;
+			}
+		} catch (e) {
+			alert(e.message);
+		} finally {
+			stopLoading();
+		}
 	}
 
-	function handleTeamBSubmitted(xi) {
+	async function handleTeamBSubmitted(xi) {
 		if (xi.length !== 11) return alert('Please select exactly 11 players');
 		playingXITeamB = [...xi];
-		currentStep = 3;
+		try {
+			startLoading('Saving fixture line for the team...');
+			const playerIds = xi.map((player) => player);
+			const body = playerIds.map((id, index) => ({
+				player_id: id,
+				team_id: currentFixture?.team_b,
+				fixture_id: fixtureId,
+				batting_order: index + 1
+			}));
+			const resp = await hplFetch(fetch, `/fixtures/lineups/${fixtureId}`, 'POST', body);
+			if (resp.ok) {
+				currentStep = 3;
+			}
+		} catch (e) {
+			alert(e.message);
+		} finally {
+			stopLoading();
+		}
 	}
 
 	function handleTossModalClose(tossWinner, decision) {
@@ -73,7 +110,27 @@
 		return defaultClasses;
 	}
 
-	async function handleStartMatch() {}
+	async function handleStartMatch() {
+		try {
+			startLoading('Staring the match...');
+			const body = {
+				fixture_id: fixtureId
+			};
+			const headers = getHeaderAuthorisation();
+			const resp = await hplFetch(fetch, '/fixtures/start', 'POST', body, headers);
+			if (!resp.ok) {
+				const errorData = await resp.json();
+				throw new Error(errorData.message || 'Match start failed on the server.');
+			}
+			alert('Match started successfully! Going Live.');
+			//
+			goto(`/admin/match/score/${fixtureId}`);
+		} catch (e) {
+			alert(e.message);
+		} finally {
+			stopLoading();
+		}
+	}
 </script>
 
 <div class="bg-gray-50 min-h-screen">

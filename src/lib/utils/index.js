@@ -113,3 +113,11 @@ export function getRole(role) {
 			return role;
 	}
 }
+
+export function getHeaderAuthorisation() {
+	const user = JSON.parse(localStorage.getItem('hpl-user'));
+	const token = user.access_token;
+	return {
+		Authorization: `Bearer ${token}`
+	};
+}
