@@ -1,79 +1,91 @@
 <script>
-	import { getRole } from '$lib/utils';
+	import { getPlayerFirstAndLastName, getRole } from '$lib/utils';
 
 	const { teamId, players, handleSubmit } = $props();
+
+	// This array will preserve the exact order of clicks
 	let xi = $state([]);
-	let selectedPlayerIds = $derived(new Set(xi));
+
 	const MAX_PLAYERS = 11;
+
 	function togglePlayer(playerId) {
-		if (selectedPlayerIds.has(playerId)) {
-			// Remove player (tracked array mutation)
-			xi = xi.filter((id) => id !== playerId);
-		} else if (xi.length < 11) {
-			// Add player (tracked array mutation)
-			xi = [...xi, playerId];
-		} else {
-			alert('You can select a maximum of 11 players');
+		const existingIndex = xi.findIndex((p) => p.id === playerId);
+
+		if (existingIndex !== -1) {
+			// REMOVE: Filter out the player and re-map to fix the order sequence
+			const filtered = xi.filter((p) => p.id !== playerId);
+			xi = filtered.map((p, index) => ({
+				id: p.id,
+				order: index + 1
+			}));
+		} else if (xi.length < MAX_PLAYERS) {
+			// ADD: Push new object with the next order number
+			xi = [...xi, { id: playerId, order: xi.length + 1 }];
 		}
 	}
+
+	const getSelection = (id) => xi.find((p) => p.id === id);
 </script>
 
 <div class="bg-white p-4 rounded-xl shadow-lg">
 	<h2 class="text-xl font-bold mb-4 border-b pb-2">
-		Selected Players: {selectedPlayerIds.size} / 11
+		Selected Players: {xi.length} / 11
 	</h2>
 	<div class="grid grid-cols-1 gap-2 mb-6">
 		{#each players as player (player.id)}
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
-			<div
-				class="flex items-center justify-between p-3 rounded-lg border transition-all select-none {selectedPlayerIds.has(
-					player.id
-				)
+			{@const selection = getSelection(player.id)}
+
+			<button
+				type="button"
+				class="flex items-center justify-between p-3 rounded-lg border transition-all select-none w-full {selection
 					? 'bg-blue-50 border-blue-500 shadow-md'
 					: 'bg-gray-50 border-gray-200'}"
 				onclick={() => togglePlayer(player.id)}
 			>
 				<div class="flex items-center gap-2">
+					{#if selection}
+						<span
+							class="flex items-center justify-center bg-blue-600 text-white text-xs font-bold h-6 w-6 rounded-full"
+						>
+							{selection.order}
+						</span>
+					{/if}
+
 					<img
 						src={player.player_photo_url}
-						alt={name}
+						alt={player.name}
 						class="h-10 w-10 rounded-full border-2 border-gray-200 object-cover"
 					/>
-					<div class="flex flex-col gap-2 whitespace-nowrap overflow-hidden max-w-[80%]">
+					<div class="flex flex-col items-start whitespace-nowrap overflow-hidden">
 						<span
-							class="text-lg font-semibold mr-2 truncate {selectedPlayerIds.has(player.id)
-								? 'text-blue-800'
-								: 'text-gray-800'}">{player.name}</span
+							class="text-sm font-semibold truncate {selection ? 'text-blue-800' : 'text-gray-800'}"
 						>
+							{getPlayerFirstAndLastName(player.name)}
+						</span>
 						<span
-							class="w-fit text-xs font-medium px-2 py-0.5 rounded-full bg-yellow-200 text-yellow-800"
+							class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-yellow-200 text-yellow-800"
 						>
 							{getRole(player.role)}
 						</span>
 					</div>
 				</div>
 
-				<div class="text-xs text-gray-500">
-					{#if selectedPlayerIds.has(player.id)}
-						✅ Selected
+				<div class="text-xs font-medium">
+					{#if selection}
+						<span class="text-blue-600 uppercase">Selected</span>
 					{:else}
-						Tap to Select
+						<span class="text-gray-400">Add</span>
 					{/if}
 				</div>
-			</div>
+			</button>
 		{/each}
 	</div>
 
 	<button
-		onclick={() => {
-			handleSubmit([...selectedPlayerIds]);
-		}}
-		disabled={selectedPlayerIds.size !== MAX_PLAYERS}
-		class="flex-1 w-full h-[40px] rounded-lg flex items-center justify-center bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+		onclick={() => handleSubmit(xi)}
+		disabled={xi.length !== MAX_PLAYERS}
+		class="w-full h-[50px] rounded-lg bg-green-600 text-white font-bold hover:bg-green-700 transition disabled:bg-gray-300 disabled:text-gray-500"
 	>
-		{selectedPlayerIds.size === MAX_PLAYERS
-			? 'Confirm & Continue'
-			: `Select ${MAX_PLAYERS - selectedPlayerIds.size} more`}
+		{xi.length === MAX_PLAYERS ? 'Confirm Starting XI' : `Select ${MAX_PLAYERS - xi.length} more`}
 	</button>
 </div>

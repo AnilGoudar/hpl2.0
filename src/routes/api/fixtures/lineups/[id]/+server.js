@@ -27,3 +27,26 @@ export async function POST({ request }) {
 	}
 	return json(fixtureLineUp);
 }
+
+export async function GET({ params }) {
+	const { id } = params;
+
+	// 1. Fetch only the team_id column for rows matching the fixture_id
+	const { data, error } = await supabase
+		.from('fixture_lineups')
+		.select('team_id')
+		.eq('fixture_id', id);
+
+	if (error) {
+		return json({ error: error.message }, { status: 500 });
+	}
+
+	// 2. Aggregate the counts: { "team-uuid-1": 11, "team-uuid-2": 11 }
+	const counts = data.reduce((acc, row) => {
+		const teamId = row.team_id;
+		acc[teamId] = (acc[teamId] || 0) + 1;
+		return acc;
+	}, {});
+
+	return json(counts);
+}

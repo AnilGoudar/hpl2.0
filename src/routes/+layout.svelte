@@ -46,7 +46,7 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div class="layout-wrapper">
+<div class="layout-wrapper sm:border sm:border-gray-300 sm:max-w-[400px] sm:mx-auto">
 	<Header />
 	<main class="layout-content px-2 pt-5 bg-gray-50">
 		{@render children()}

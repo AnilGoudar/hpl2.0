@@ -35,6 +35,16 @@
 			tossDecision = fixture?.toss_decision;
 			if (fixture?.toss_winner) {
 				currentStep = 3;
+			} else {
+				const resp = await hplFetch(fetch, `/fixtures/lineups/${fixtureId}`, 'GET');
+				const data = await resp.json();
+				if (data[currentFixture.team_a] !== 11) {
+					currentStep = 1;
+				} else if (data[currentFixture.team_b] !== 11) {
+					currentStep = 2;
+				} else {
+					currentStep = 3;
+				}
 			}
 		} catch (e) {
 			alert(e.message);
@@ -52,11 +62,11 @@
 		try {
 			startLoading('Saving fixture line for the team...');
 			const playerIds = xi.map((player) => player);
-			const body = playerIds.map((id, index) => ({
-				player_id: id,
+			const body = playerIds.map((player, index) => ({
+				player_id: player.id,
 				team_id: currentFixture?.team_a,
 				fixture_id: fixtureId,
-				batting_order: index + 1
+				batting_order: player.order
 			}));
 			const resp = await hplFetch(fetch, `/fixtures/lineups/${fixtureId}`, 'POST', body);
 			if (resp.ok) {
@@ -75,11 +85,11 @@
 		try {
 			startLoading('Saving fixture line for the team...');
 			const playerIds = xi.map((player) => player);
-			const body = playerIds.map((id, index) => ({
-				player_id: id,
+			const body = playerIds.map((player, index) => ({
+				player_id: player.id,
 				team_id: currentFixture?.team_b,
 				fixture_id: fixtureId,
-				batting_order: index + 1
+				batting_order: player.order
 			}));
 			const resp = await hplFetch(fetch, `/fixtures/lineups/${fixtureId}`, 'POST', body);
 			if (resp.ok) {
@@ -133,7 +143,7 @@
 	}
 </script>
 
-<div class="bg-gray-50 min-h-screen">
+<div class="w-full bg-gray-50 min-h-screen">
 	{#if !currentFixture}
 		<div class="text-center text-gray-500">Loading fixture details...</div>
 	{:else}
@@ -188,7 +198,7 @@
 						<div class="flex flex-col items-center gap-4 mb-6 text-gray-900">
 							<!-- Winner -->
 							<div class="flex items-center gap-2 text-xl font-bold">
-								<DisplayTeamLogoName teamId={tossWinnerId} />
+								⭐️<DisplayTeamLogoName teamId={tossWinnerId} />⭐️
 							</div>
 
 							<!-- Decision -->
@@ -197,7 +207,7 @@
 
 								<span
 									class="px-3 py-1 rounded-full text-white text-sm font-black uppercase tracking-wide
-					{tossDecision === 'bat' ? 'bg-orange-600 shadow-md' : 'bg-blue-600 shadow-md'}"
+									{tossDecision === 'bat' ? 'bg-orange-600 shadow-md' : 'bg-blue-600 shadow-md'}"
 								>
 									{tossDecision}
 								</span>
@@ -208,10 +218,10 @@
 						<button
 							onclick={handleStartMatch}
 							class="w-full py-4 rounded-xl text-lg font-black text-white
-			bg-green-600 hover:bg-green-700 active:bg-green-800
-			transition shadow-lg shadow-green-900/20"
+									bg-green-600 hover:bg-green-700 active:bg-green-800
+									transition shadow-lg shadow-green-900/20"
 						>
-							GO LIVE 🔴
+							Start Match 🔴
 						</button>
 					</div>
 				{:else}

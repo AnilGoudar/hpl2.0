@@ -116,8 +116,16 @@ export function getRole(role) {
 
 export function getHeaderAuthorisation() {
 	const user = JSON.parse(localStorage.getItem('hpl-user'));
-	const token = user.access_token;
-	return {
-		Authorization: `Bearer ${token}`
-	};
+	const token = user?.access_token;
+	if (token) {
+		return {
+			Authorization: `Bearer ${token}`
+		};
+	}
+	return null;
+}
+
+export function getPlayerFirstAndLastName(name) {
+	const playerName = name.trim().split(' ');
+	return playerName[0] + ' ' + playerName[playerName.length - 1];
 }

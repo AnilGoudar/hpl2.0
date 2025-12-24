@@ -18,9 +18,9 @@
 				toss_winner: tossWinnerId,
 				toss_decision: decision
 			});
-			const { toss_winner, toss_decison } = await resp.json();
+			const { toss_winner, toss_decision } = await resp.json();
 			if (toss_winner) {
-				handleClose(toss_winner, toss_decison);
+				handleClose(toss_winner, toss_decision);
 			}
 		} catch (e) {
 			alert(e.message);

@@ -56,5 +56,6 @@ export async function PUT({ params, request }) {
 	if (error) {
 		return json({ error: error.message }, { status: 500 });
 	}
+	console.log(data);
 	return json(data);
 }
