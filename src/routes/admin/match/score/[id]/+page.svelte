@@ -34,9 +34,36 @@
 		bowlingLineUp?.find((p) => p.player_id === match?.current_bowler_id)
 	);
 
+	let maxBallsPerInnings = $derived.by(() => match?.max_balls_per_innings ?? 48);
+
+	let isInningsOver = $derived.by(() => {
+		if (!match) return false;
+		return match?.current_inning_wickets >= 10 || match?.total_balls >= maxBallsPerInnings;
+	});
+
+	let isMatchOver = $derived.by(() => {
+		if (!match || match?.current_inning !== 2) return false;
+		const target = match?.first_innings_total + 1;
+		const chased = match?.current_inning_runs >= target;
+		const defended =
+			(match?.total_balls >= maxBallsPerInnings || match?.current_inning_wickets >= 10) &&
+			match.current_inning_runs < match?.first_innings_total;
+		const tied =
+			(match.total_balls >= maxBallsPerInnings || match.current_inning_wickets >= 10) &&
+			match.current_inning_runs === match.first_innings_total;
+
+		return chased || defended || tied;
+	});
+
+	let maxOversDisplay = $derived.by(() => {
+		const total = match?.max_balls_per_innings ?? 48;
+		return `${Math.floor(total / 6)}.${total % 6}`;
+	});
+
 	// modals
 	let showWicketModal = $state(false);
 	let showBowlerModal = $derived.by(() => (bowler ? false : true));
+	let showInningsBreakModal = $derived.by(() => isInningsOver && match?.current_inning === 1);
 
 	async function getLiveMatchData() {
 		try {
@@ -135,42 +162,113 @@
 	}
 
 	let availableBatsmen = $derived.by(() => {
-		return battingLineUp.filter(
+		return battingLineUp?.filter(
 			(p) => !p.is_out && p.player_id !== match?.striker_id && p.player_id !== match?.non_striker_id
 		);
 	});
+
+	// Add to your state variables
+	let newStrikerId = $state('');
+	let newNonStrikerId = $state('');
+	let openingBowlerId = $state('');
+	async function handleStartSecondInnings() {
+		if (!newStrikerId || !newNonStrikerId || !openingBowlerId) {
+			alert('Please select all players to continue');
+			return;
+		}
+		const body = {
+			p_fixture_id: fixtureId,
+			p_new_striker_id: newStrikerId,
+			p_new_non_striker_id: newNonStrikerId,
+			p_new_bowler_id: openingBowlerId
+		};
+
+		const headers = getHeaderAuthorisation();
+		const resp = await hplFetch(
+			fetch,
+			`/fixtures/live/switch-innings/${fixtureId}`,
+			'POST',
+			body,
+			headers
+		);
+		if (resp.success) {
+			newStrikerId = '';
+			newNonStrikerId = '';
+			openingBowlerId = '';
+			getLiveMatchData();
+		}
+	}
+
+	async function handleMatchOverAndPointsUpdate() {
+		if (!match || match.current_inning !== 2) return;
+	}
 </script>
 
 {#if match}
 	<div class="flex flex-col h-full w-full">
 		<header
-			class="bg-gradient-to-r from-slate-100 via-white to-slate-100 shadow-lg border-b border-slate-200"
+			class="bg-gradient-to-r from-slate-100 via-white to-slate-100 border-b border-slate-200"
 		>
-			<div class="max-w-7xl mx-auto px-4 py-3">
+			<div class="max-w-7xl mx-auto px-4 py-4">
 				<div class="flex items-center justify-between">
-					<!-- Team -->
-					<div class="flex items-center gap-3 text-black">
-						<DisplayTeamLogoName teamId={match.batting_team_id} />
-					</div>
-
-					<!-- Score -->
-					<div class="text-center text-black">
-						<h1 class="text-5xl font-extrabold tracking-tight">
-							{match.current_inning_runs}
-							<span class="text-slate-500 text-3xl">/{match.current_inning_wickets}</span>
-						</h1>
-						<p class="text-xs uppercase tracking-widest text-slate-500 mt-1">Current Score</p>
-					</div>
-
-					<!-- Overs -->
-					<div class="text-right text-black">
-						<p class="text-2xl font-mono">
-							{Math.floor(match.total_balls / 6)}.
-							<span class="text-slate-500">{match.total_balls % 6}</span>
+					<div class="flex-1">
+						<p class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">
+							Innings {match.current_inning}
 						</p>
-						<p class="text-xs uppercase tracking-widest text-slate-500">Overs</p>
+						<div class="flex items-center gap-2">
+							<DisplayTeamLogoName teamId={match.batting_team_id} />
+						</div>
+					</div>
+
+					<div class="flex flex-col items-center flex-1">
+						<div class="flex items-baseline leading-none">
+							<span class="text-6xl font-black text-slate-900 tracking-tighter">
+								{match.current_inning_runs}
+							</span>
+							<span class="text-4xl font-bold text-slate-300 mx-1">/</span>
+							<span class="text-5xl font-black text-red-600 tracking-tighter">
+								{match.current_inning_wickets}
+							</span>
+						</div>
+
+						{#if match.current_inning === 2}
+							<p class="text-xs font-bold text-slate-500 mt-2">
+								Target: <span class="text-slate-900">{match.first_innings_total + 1}</span>
+							</p>
+						{/if}
+					</div>
+
+					<div class="flex flex-col items-end flex-1">
+						<div class="text-right">
+							<p class="text-3xl font-mono font-black text-slate-800 leading-none">
+								{Math.floor(match.total_balls / 6)}.{match.total_balls % 6}
+							</p>
+							<p class="text-[10px] font-bold text-slate-400 uppercase mt-1">
+								of {Math.floor(maxBallsPerInnings / 6)} overs
+							</p>
+						</div>
+						<div class="w-20 h-1.5 bg-slate-100 rounded-full mt-2 overflow-hidden">
+							<div
+								class="h-full bg-slate-800 transition-all duration-500"
+								style="width: {(match.total_balls / maxBallsPerInnings) * 100}%"
+							></div>
+						</div>
 					</div>
 				</div>
+
+				{#if match.current_inning === 2}
+					<div class="mt-4 pt-3 border-t border-slate-100 text-center">
+						<span class="text-sm font-medium text-slate-600">
+							Need <span class="font-black text-indigo-600"
+								>{match.first_innings_total + 1 - match.current_inning_runs}</span
+							>
+							runs from
+							<span class="font-black text-indigo-600"
+								>{maxBallsPerInnings - match.total_balls}</span
+							> balls
+						</span>
+					</div>
+				{/if}
 			</div>
 		</header>
 
@@ -356,6 +454,119 @@
 					class="text-slate-400 text-sm font-bold py-2">Go Back</button
 				>
 			</div>
+		</div>
+	</div>
+{/if}
+
+{#if showInningsBreakModal}
+	<div
+		class="fixed inset-0 z-[100] bg-indigo-950 flex items-center justify-center p-6 backdrop-blur-xl"
+	>
+		<div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl">
+			<div class="text-center mb-6">
+				<span
+					class="bg-amber-100 text-amber-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest"
+				>
+					Innings Break
+				</span>
+				<h2 class="text-3xl font-black text-slate-900 mt-4 leading-tight">1st Innings Complete</h2>
+				<p class="text-slate-500 font-medium">
+					Final Score: {match.current_inning_runs}/{match.current_inning_wickets}
+				</p>
+			</div>
+
+			<div class="space-y-4 mb-8">
+				<div>
+					<label class="text-[10px] font-bold text-slate-400 uppercase ml-1">New Striker</label>
+					<select
+						bind:value={newStrikerId}
+						class="w-full p-4 bg-slate-100 rounded-xl font-bold appearance-none border-2 border-transparent focus:border-indigo-500 outline-none"
+					>
+						<option value="">Select Striker</option>
+						{#each bowlingLineUp as p}<option value={p.player_id}>{p.name}</option>{/each}
+					</select>
+				</div>
+
+				<div>
+					<label class="text-[10px] font-bold text-slate-400 uppercase ml-1">New Non-Striker</label>
+					<select
+						bind:value={newNonStrikerId}
+						class="w-full p-4 bg-slate-100 rounded-xl font-bold appearance-none border-2 border-transparent focus:border-indigo-500 outline-none"
+					>
+						<option value="">Select Non-Striker</option>
+						{#each bowlingLineUp as p}<option value={p.player_id}>{p.name}</option>{/each}
+					</select>
+				</div>
+
+				<div>
+					<label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Opening Bowler</label>
+					<select
+						bind:value={openingBowlerId}
+						class="w-full p-4 bg-slate-100 rounded-xl font-bold appearance-none border-2 border-transparent focus:border-indigo-500 outline-none"
+					>
+						<option value="">Select Bowler</option>
+						{#each battingLineUp as p}<option value={p.player_id}>{p.name}</option>{/each}
+					</select>
+				</div>
+			</div>
+
+			<button
+				onclick={handleStartSecondInnings}
+				class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-indigo-200 active:scale-95 transition-all"
+			>
+				START 2ND INNINGS
+			</button>
+		</div>
+	</div>
+{/if}
+
+{#if isMatchOver}
+	<div
+		class="fixed inset-0 z-[120] bg-slate-900/95 flex items-center justify-center p-6 backdrop-blur-md"
+	>
+		<div
+			class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm text-center shadow-2xl border-4 border-indigo-500"
+		>
+			<div class="mb-4 inline-flex p-4 bg-indigo-50 rounded-full text-indigo-600">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="32"
+					height="32"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="3"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					><circle cx="12" cy="8" r="7" /><polyline
+						points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"
+					/></svg
+				>
+			</div>
+
+			<h2 class="text-3xl font-black text-slate-900 mb-2 uppercase italic tracking-tighter">
+				Match Over!
+			</h2>
+
+			<div class="bg-slate-50 rounded-2xl p-4 mb-6 border border-slate-100">
+				<p class="text-indigo-600 font-black text-xl leading-tight">
+					{#if match.current_inning_runs > match.first_innings_total}
+						{battingTeamId?.name ?? 'Chasing Team'} won by {10 - match.current_inning_wickets} wickets
+					{:else if match.current_inning_runs < match.first_innings_total}
+						{bowlingTeamId?.name ?? 'Defending Team'} won by {match.first_innings_total -
+							match.current_inning_runs} runs
+					{:else}
+						Match Tied!
+					{/if}
+				</p>
+			</div>
+
+			<button
+				onclick={() => (window.location.href = '/')}
+				class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-lg shadow-lg active:scale-95 transition-transform"
+			>
+				EXIT TO DASHBOARD
+			</button>
 		</div>
 	</div>
 {/if}
