@@ -4,6 +4,8 @@
 	import { onMount } from 'svelte';
 	import DisplayTeamLogoName from './DisplayTeamLogoName.svelte';
 	import { supabase } from '$lib/supabaseClient';
+	import { userState } from '$lib/state/+state.svelte';
+	import Avatar from './Avatar.svelte';
 
 	let matchData = $state(null);
 	let match = $derived.by(() => matchData?.live_match);
@@ -19,6 +21,10 @@
 	let target = $derived(isSecondInnings ? match.first_innings_total + 1 : null);
 	let runsNeeded = $derived(target ? target - match.current_inning_runs : null);
 
+	let strikerStats = $state(null);
+	let nonStrikerStats = $state(null);
+	let bowlerStats = $state(null);
+
 	async function getLiveMatchData() {
 		try {
 			if (!fixtureId) return;
@@ -31,8 +37,36 @@
 				headers
 			);
 			matchData = await data.json();
+			getActiveStats();
 		} catch (e) {
 			console.log(e);
+		}
+	}
+
+	async function getActiveStats() {
+		if (!match) return;
+		const { data } = await supabase
+			.from('player_stats')
+			.select('*')
+			.eq('fixture_id', fixtureId)
+			.in('player_id', [match.striker_id, match.non_striker_id, match.current_bowler_id]);
+
+		if (data) {
+			strikerStats = data.find((p) => p.player_id === match.striker_id);
+			nonStrikerStats = data.find((p) => p.player_id === match.non_striker_id);
+			bowlerStats = data.find((p) => p.player_id === match.current_bowler_id);
+			strikerStats = {
+				...strikerStats,
+				name: getPlayerName(match.striker_id)
+			};
+			nonStrikerStats = {
+				...nonStrikerStats,
+				name: getPlayerName(match.non_striker_id)
+			};
+			bowlerStats = {
+				...bowlerStats,
+				name: getPlayerName(match.current_bowler_id, 'bowling')
+			};
 		}
 	}
 
@@ -40,6 +74,25 @@
 		const data = await hplFetch(fetch, '/fixtures/live');
 		const liveFixtures = await data.json();
 		fixtureId = liveFixtures?.fixture_id;
+	});
+
+	$effect(() => {
+		// Listen to player_stats directly for lightning fast UI updates
+		const channel = supabase
+			.channel('live_player_updates')
+			.on(
+				'postgres_changes',
+				{
+					event: 'UPDATE',
+					schema: 'public',
+					table: 'player_stats',
+					filter: `fixture_id=eq.${fixtureId}`
+				},
+				getActiveStats
+			)
+			.subscribe();
+
+		return () => supabase.removeChannel(channel);
 	});
 
 	$effect(() => {
@@ -104,6 +157,17 @@
 		return 'Team';
 	});
 
+	let getPlayerName = $derived((id, team = 'batting') => {
+		if (matchData?.batting_players && team === 'batting') {
+			const player = matchData.batting_players.find((p) => p.player_id === id);
+			return player ? player.name : 'Batsman';
+		}
+		if (matchData?.bowling_players) {
+			const player = matchData.bowling_players.find((p) => p.player_id === id);
+			return player ? player.name : 'Bowler';
+		}
+	});
+
 	let isMatchOver = $derived.by(() => {
 		if (!match || match.current_inning !== 2) return false;
 		const target = match.first_innings_total + 1;
@@ -137,7 +201,9 @@
 	<a
 		href={isMatchOver
 			? `/match/summary/${match.fixture_id}`
-			: `/admin/match/score/${match.fixture_id}`}
+			: ['Admin', 'Super Admin'].includes(userState.role)
+				? `/admin/match/score/${match.fixture_id}`
+				: `/match/live/${match.fixture_id}`}
 		class="relative w-full block border rounded-2xl p-5 transition-all duration-300 max-w-md mx-auto group overflow-hidden
         {isMatchOver
 			? 'bg-slate-50 border-indigo-200'
@@ -193,6 +259,49 @@
 				</div>
 			</div>
 		</div>
+
+		{#if strikerStats || nonStrikerStats || bowlerStats}
+			<hr class="border-slate-200 mb-4" />
+			<div class="flex flex-col gap-2 text-sm">
+				<div class="flex items-center mb-1">
+					<Avatar
+						name={strikerStats ? strikerStats.name : 'Striker'}
+						size="sm"
+						class="inline-block mr-2"
+						isStriker={true}
+					/>
+					<span class="text-slate-800 tracking-tight">
+						{strikerStats ? `${strikerStats.runs_scored} (${strikerStats.balls_faced})` : '0 (0)'}
+					</span>
+				</div>
+				<div class="flex items-center mb-1">
+					<Avatar
+						name={nonStrikerStats ? nonStrikerStats.name : 'Non-Striker'}
+						size="sm"
+						class="inline-block mr-2"
+						isStriker={false}
+					/>
+					<span class="text-slate-800 tracking-tight">
+						{nonStrikerStats
+							? `${nonStrikerStats.runs_scored} (${nonStrikerStats.balls_faced})`
+							: '0 (0)'}
+					</span>
+				</div>
+				<div class="text-sm text-slate-500 uppercase">Bowling</div>
+				<div class="flex items-center mb-1">
+					<Avatar
+						name={bowlerStats ? bowlerStats.name : 'Bowler'}
+						size="sm"
+						class="inline-block mr-2"
+					/>
+					<span class="text-slate-800 tracking-tight">
+						{bowlerStats
+							? `${bowlerStats.wickets}-${bowlerStats.runs_conceded} (${Math.floor(bowlerStats?.balls_bowled / 6)}.${bowlerStats?.balls_bowled % 6})`
+							: '0-0 (0)'}
+					</span>
+				</div>
+			</div>
+		{/if}
 
 		<div class="pt-4 border-t border-slate-100">
 			{#if isMatchOver}
