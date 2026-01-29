@@ -33,7 +33,7 @@
 	async function handleFixtureClick() {
 		if (!userState?.id || userState.role !== 'Super Admin') return;
 
-		const status = match.status.toLowerCase();
+		const status = match.status?.toLowerCase();
 
 		if (status === 'upcoming' || status === 'scheduled') {
 			goto(`/admin/match/prepare/${match.id}`);
@@ -53,12 +53,12 @@
 			Match #{match.match_number} (Leg: {match.leg})
 		</div>
 		<div
-			class={`flex gap-2 items-center text-[10px] px-2 py-1 rounded-full font-semibold ${getStatusBadge(match.status.toLowerCase())}`}
+			class={`flex gap-2 items-center text-[10px] px-2 py-1 rounded-full font-semibold ${getStatusBadge(match.status?.toLowerCase())}`}
 		>
-			{#if match.status.toUpperCase() === 'LIVE'}
+			{#if match.status?.toUpperCase() === 'LIVE'}
 				<img src={Radio} alt="live-badge" class="w-4 h-4 object-cover" />
 			{/if}
-			{match.status.toUpperCase()}
+			{match.status?.toUpperCase()}
 		</div>
 	</div>
 	<div class="flex items-center mb-3">

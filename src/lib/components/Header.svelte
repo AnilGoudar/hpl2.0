@@ -1,5 +1,5 @@
 <script>
-	import logo from '$lib/assets/logo-hpl.jpeg';
+	import logo from '$lib/assets/hpl.png';
 </script>
 
 <header

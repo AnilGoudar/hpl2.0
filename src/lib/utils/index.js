@@ -65,7 +65,7 @@ export async function fakePayementScreenshots(file) {
 export function displayTeamName(name) {
 	let displayName = '';
 	switch (name) {
-		case 'BSS Hunters':
+		case 'BSS Panthers':
 			displayName = 'BSS';
 			break;
 		case 'Rani Chennamma Warriors':
