@@ -62,8 +62,7 @@ Think of it as *"IPL-style experience for local cricket."*
 
 > Exact stack may evolve as the project scales.
 
-* **Frontend:** Svelte
-* **Backend:** Node.js
+* **Frontend:** and * **Backend:** SvelteKit
 * **Database:** MongoDB / PostgreSQL (TBD)
 * **Hosting:** Cloud-based Vercel
 * **Version Control:** Git & GitHub
