@@ -46,9 +46,9 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div class="layout-wrapper sm:border sm:border-gray-300 sm:max-w-[400px] sm:mx-auto">
+<div class="layout-wrapper border border-gray-300 sm:max-w-[400px] sm:mx-auto">
 	<Header />
-	<main class="layout-content px-2 pt-5 bg-gray-50">
+	<main class="layout-content px-2 pt-5">
 		{@render children()}
 	</main>
 	<BottomNavbar />
@@ -68,7 +68,7 @@
 	.layout-wrapper {
 		display: flex;
 		flex-direction: column;
-		height: 100vh;
+		height: 100%;
 	}
 	.layout-content {
 		flex: 1;

@@ -21,7 +21,7 @@
 </script>
 
 {#if user}
-	<div class="container flex flex-col gap-[20px] py-10 px-2 w-full">
+	<div class="container flex flex-col gap-[20px] py-10 px-2 w-full h-[100vh]">
 		<div class="flex items-center gap-4">
 			<h2 class="text-lg">Name:</h2>
 			<p class="text-lg font-bold text-gray-900">{user.name || 'Admin'}</p>

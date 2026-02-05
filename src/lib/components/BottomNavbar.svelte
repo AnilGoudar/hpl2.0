@@ -7,7 +7,7 @@
 </script>
 
 <div
-	class="fixed bottom-0 left-0 w-full h-20 bg-white/95 backdrop-blur-md shadow-[0_-2px_6px_rgba(0,0,0,0.1)] flex justify-around items-center z-50 md:hidden"
+	class="fixed bottom-0 left-0 w-full h-20 bg-white/95 backdrop-blur-md shadow-[0_-2px_6px_rgba(0,0,0,0.1)] flex justify-around items-center z-50 md:w-[400px] md:left-1/2 md:transform md:-translate-x-1/2 rounded-tl-lg rounded-tr-lg"
 >
 	{#each bottomNavLinks as nav}
 		{#if nav.title !== 'Points Table'}

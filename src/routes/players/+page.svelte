@@ -21,7 +21,7 @@
 	{#if players.length === 0}
 		<p class="text-center text-gray-500">No players registered yet.</p>
 	{:else}
-		<div class="w-full grid grid-cols-1 gap-4 sm:grid-cols-3">
+		<div class="w-full grid grid-cols-1 gap-4">
 			{#each players as player}
 				<PlayerCard {player} />
 			{/each}
